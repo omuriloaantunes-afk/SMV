@@ -71,6 +71,13 @@
 }
 .animate-float { animation: float 4s ease-in-out infinite; }
 
+/* Typing cursor animation */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.animate-blink { animation: blink 1s infinite; }
+
 /* Red glow animations */
 @keyframes redGlowPulse {
   0% { opacity: .7; filter: blur(12px); }

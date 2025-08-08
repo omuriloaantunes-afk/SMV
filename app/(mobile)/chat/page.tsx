@@ -8,12 +8,23 @@ import { RED } from "@/lib/constants"
 import { Activity, Zap, BookOpen, Moon, Brain, Share2, Bookmark, Bot, User } from 'lucide-react'
 import { StoryPills } from "@/components/mobile/story-pills"
 import { useTasks } from "@/hooks/use-tasks"
+import { TypingAnimation } from "@/components/ui/typing-animation"
 
-type Msg = { id: string; role: "user" | "ai"; text: string }
+type Msg = { 
+  id: string; 
+  role: "user" | "ai"; 
+  text: string;
+  isTyping?: boolean;
+}
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Msg[]>([
-    { id: "m0", role: "ai", text: "Fala, guerreiro! SMV aqui. Pronto para dominar mais um dia? Me conta o que temos pela frente hoje que eu vou te ajudar a organizar essa parada e transformar você numa máquina de resultados!" },
+    { 
+      id: "m0", 
+      role: "ai", 
+      text: "Fala, guerreiro! SMV aqui. Pronto para dominar mais um dia? Me conta o que temos pela frente hoje que eu vou te ajudar a organizar essa parada e transformar você numa máquina de resultados! Qual é a sua prioridade número 1 agora?",
+      isTyping: false // Mensagem inicial já aparece completa
+    },
   ])
   const [selectedStory, setSelectedStory] = useState<string | undefined>("foco")
   const [isLoading, setIsLoading] = useState(false)
@@ -48,7 +59,7 @@ export default function ChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: text,
-          conversationHistory: messages.slice(-10) // Últimas 10 mensagens para contexto
+          conversationHistory: messages.slice(-8) // Últimas 8 mensagens para contexto
         })
       })
 
@@ -58,30 +69,38 @@ export default function ChatPage() {
         throw new Error(data.error)
       }
 
-      // Adicionar resposta da IA
+      // Adicionar resposta da IA com animação de digitação
       const aiMessageId = `ai-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+      
+      // Primeiro adiciona uma mensagem vazia que vai ser "digitada"
       setMessages((m) => [...m, { 
         id: aiMessageId, 
         role: "ai", 
-        text: data.response 
+        text: data.response,
+        isTyping: true
       }])
 
       // Se a IA identificou tarefas, adicionar ao sistema
       if (data.tasks && data.tasks.length > 0) {
         console.log('Tarefas identificadas pela IA:', data.tasks)
-        await addTasksFromAI(data.tasks)
         
-        // Mostrar notificação de tarefas criadas
-        const taskCount = data.tasks.length
-        const taskNotification = `✅ Criei ${taskCount} tarefa${taskCount > 1 ? 's' : ''} para você na aba Tarefas!`
-        
-        setTimeout(() => {
-          setMessages((m) => [...m, { 
-            id: `notification-${Date.now()}`, 
-            role: "ai", 
-            text: taskNotification 
-          }])
-        }, 1000)
+        // Aguardar um pouco para a animação de digitação
+        setTimeout(async () => {
+          await addTasksFromAI(data.tasks)
+          
+          // Mostrar notificação de tarefas criadas
+          const taskCount = data.tasks.length
+          const taskNotification = `✅ Criei ${taskCount} tarefa${taskCount > 1 ? 's' : ''} para você na aba Tarefas!`
+          
+          setTimeout(() => {
+            setMessages((m) => [...m, { 
+              id: `notification-${Date.now()}`, 
+              role: "ai", 
+              text: taskNotification,
+              isTyping: true
+            }])
+          }, 500)
+        }, 2000)
       }
 
     } catch (error) {
@@ -91,7 +110,8 @@ export default function ChatPage() {
       setMessages((m) => [...m, { 
         id: `error-${Date.now()}`, 
         role: "ai", 
-        text: "Eita, guerreiro! Deu um problema aqui. Tenta de novo que eu vou te responder na lata!" 
+        text: "Eita, guerreiro! Deu um problema aqui. Tenta de novo que eu vou te responder na lata!",
+        isTyping: true
       }])
     } finally {
       setIsLoading(false)
@@ -194,7 +214,20 @@ export default function ChatPage() {
                               }
                         }
                       >
-                        {m.text}
+                        {m.isTyping && !isUser ? (
+                          <TypingAnimation 
+                            text={m.text} 
+                            speed={30}
+                            onComplete={() => {
+                              // Marcar como não digitando quando completar
+                              setMessages(prev => prev.map(msg => 
+                                msg.id === m.id ? { ...msg, isTyping: false } : msg
+                              ))
+                            }}
+                          />
+                        ) : (
+                          m.text
+                        )}
                       </div>
                       {isUser && (
                         <div className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mt-1">
