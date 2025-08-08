@@ -1,0 +1,92 @@
+/* Tailwind base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base reset and theme */
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Tailwind CSS variables */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 5.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 5.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 72% 51%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 72% 51%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.75rem;
+  }
+
+  html, body {
+    height: 100%;
+    overflow-x: hidden; /* Previne rolagem horizontal */
+    max-width: 100vw; /* Garante que não ultrapasse a largura da viewport */
+  }
+  body {
+    background-color: #000;
+    color: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type="number"] { -moz-appearance: textfield; }
+
+  /* Previne overflow em todos os elementos */
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* Utilities */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+::placeholder { color: rgba(255, 255, 255, 0.55); }
+
+/* Floating animation for particles */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
+  25% { transform: translateY(-10px) rotate(90deg); opacity: 0.3; }
+  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.2; }
+  75% { transform: translateY(-10px) rotate(270deg); opacity: 0.3; }
+}
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Red glow animations */
+@keyframes redGlowPulse {
+  0% { opacity: .7; filter: blur(12px); }
+  50% { opacity: 1; filter: blur(20px); }
+  100% { opacity: .7; filter: blur(12px); }
+}
+.animate-red-glow { animation: redGlowPulse 6s ease-in-out infinite; }
+
+/* Stronger variant for Chat header (mais perceptível) */
+@keyframes redGlowPulseStrong {
+  0% { opacity: .55; filter: blur(12px); transform: scale(1) translateX(-50%); }
+  50% { opacity: 1; filter: blur(28px); transform: scale(1.05) translateX(-50%); }
+  100% { opacity: .55; filter: blur(12px); transform: scale(1) translateX(-50%); }
+}
+.animate-red-glow-strong { 
+  animation: redGlowPulseStrong 4.5s ease-in-out infinite; 
+  left: 50%;
+  transform-origin: center;
+}
